@@ -19,12 +19,16 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Função para carregar frases de um arquivo
 def load_phrases(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return [line.strip() for line in file.readlines()]
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return [line.strip() for line in file.readlines()]
+    except FileNotFoundError:
+        print(f"Arquivo {file_path} não encontrado.")
+        return []
 
 # para carregar frases de ativação e resposta
-ATIVACAO = load_phrases('ativacao')
-RESPOSTA = load_phrases('resposta')
+ATIVACAO = load_phrases('ativacao.txt')
+RESPOSTA = load_phrases('resposta.txt')
 
 # função que simula a digitação
 async def digitando_a_mensagem(channel, message):
@@ -50,13 +54,17 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    print(f"Mensagem recebida: {message.content}")  # Log para depuração
+
     content_lower = message.content.lower()
 
     for trigger, response in zip(ATIVACAO, RESPOSTA):
-        if trigger in content_lower:
+        print(f"Checando ativação: {trigger}")  # Verificar cada ativação
+        if trigger.lower() in content_lower:  # Comparação case-insensitive
             formatted_response = response.replace("{author}", message.author.mention)
+            print(f"Ativação encontrada: {trigger}. Respondendo com: {formatted_response}")
             await send_typing_message(message.channel, formatted_response)
-            break  # Garante que o bot só responda uma vez
+            break
 
     await bot.process_commands(message)
 
