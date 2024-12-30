@@ -4,3 +4,4 @@ que bom, estou bem também
 bom dia {author}
 boa tarde {author}
 boa noite {author}
+sim {author}, o dia está realmente lindo
